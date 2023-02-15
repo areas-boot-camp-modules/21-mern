@@ -87,3 +87,82 @@ const [addProfile, { error }] = useMutation(ADD_PROFILE)
 ## 19.3: 
 
 ---
+### Sign JWT
+- GraphQL doesn’t really do cookies.
+- There are resolver, auth, and typeDefs files.
+
+```
+const jwt = require("jsonwebtoken")
+
+const secret = "secret"
+...
+```
+
+```
+type Auth {
+	token: ID!
+	profile: Profile
+}
+
+...
+
+type Mutation {
+	addProfile(name: String!, email: String!, password: String!): Auth
+	...
+}
+```
+
+---
+### Decode JWT
+- The client decodes the JWT.
+- GraphQL can’t create a cookie. Why not?
+- Get a token from the server, then it’s saved to local storage.
+- Also uses authorization headers.
+
+```
+...
+const authLink = setContext((_. { headers }) => {
+	const token = localStorage.getItem("id_token")
+	return {
+		headers: {
+			...headers,
+			authorization: token ? `Bearer ${token}` : ``,
+		},
+	}
+})
+```
+
+---
+### Resolver Context
+- No cookies, just headers!
+- `authMiddleware`
+- It’s more complicated to set up on the server, but more flexible for the front end.
+- Express makes it easy, which is why it’s so popular.
+- Things in resolver.js have 3 parameters. Something important to know when writing code and debuging.
+
+```
+authMiddleware: function ({ req }) {
+	let token = req.body.token || req.query.token || req.headers.authorization
+
+	if (token) {
+		token = token.split(" ").pop().trim()
+	}
+
+	if (!token) {
+		return req
+	}
+
+	try {
+		const { data } = jwt.verify(token, secret, )
+	}
+}
+```
+
+---
+### GitHub Actions
+- You set them up by creating a `.github/workflow` folder.
+
+---
+### Mini Project
+
+---

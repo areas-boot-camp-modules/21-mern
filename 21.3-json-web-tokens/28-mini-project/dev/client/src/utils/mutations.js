@@ -20,4 +20,4 @@ export const CREATE_VOTE = gql`
       tech2_votes
     }
   }
-`;
+`
